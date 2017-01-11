@@ -11,7 +11,7 @@ def load_gui(self):
 	self.dailyButton.grid(row=1,column=0,padx=(25,0),pady=(45,10),sticky=W)
 	self.destButton = tk.Button(self.master, width=18, height=1, text = 'Destination Folder', command = lambda: PyDrill_db_34_idle_func.getDestPath(self))
 	self.destButton.grid(row=4,column=0,padx=(25,0),pady=(45,10),sticky=W)
-	self.checkButton = tk.Button(self.master, width=18, height=1, text = 'File Check', command = lambda: PyDrill_db_34_idle_func.copyFiles(self))
+	self.checkButton = tk.Button(self.master, width=18, height=1, text = 'File Check', command = lambda: PyDrill_db_34_idle_func.runAllTheThings(self))
 	self.checkButton.grid(row=8,column=0,padx=(25,0),pady=(25,10),sticky=W)
 		
 	#entry wigits for source path, destination path, and timestamp of last file check
@@ -27,3 +27,5 @@ def load_gui(self):
 	self.lastCheckDisplay = tk.Entry(width=50, textvariable = self.chec)
 	self.lastCheckDisplay.grid(row=8,column=2, padx=(25,0),pady=(25,10))
     
+	PyDrill_db_34_idle_func.createDbTable(self)
+	PyDrill_db_34_idle_func.displayLastCheck(self)

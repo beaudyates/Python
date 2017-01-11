@@ -3,6 +3,8 @@ import tkinter as tk
 import os
 import shutil
 import time as t
+import sqlite3
+import datetime
 import PyDrill_db_34_idle_main
 import PyDrill_db_34_idle_gui
 
@@ -16,11 +18,45 @@ def center_window(self, w, h): # pass in the tkinter frame (master) reference an
     y = int((screen_height/2) - (h/2))
     centerGeo = self.master.geometry('{}x{}+{}+{}'.format(w, h, x, y))
     return centerGeo
+	
 
+def createDbTable(self):
+	conn = sqlite3.connect('dailyFileCopy.db')
+	with conn:
+		c = conn.cursor()
+		c.execute('CREATE TABLE IF NOT EXISTS fileCheckLog (id INTEGER PRIMARY KEY AUTOINCREMENT, fcTime timestamp);')
+		conn.commit()
+	conn.close()
+	
+	
+def displayLastCheck(self):
+	conn = sqlite3.connect('dailyFileCopy.db')
+	with conn:
+		c = conn.cursor()
+		c.execute('SELECT * FROM fileCheckLog LIMIT 1')
+		recordCount = c.fetchone()
+		c.execute('SELECT fcTime FROM fileCheckLog ORDER BY id DESC LIMIT 1')
+		showRecent = c.fetchone()
+		if not recordCount:
+			self.chec.set('No file check runs to date') 
+		else:	
+			self.chec.set(showRecent)
+	conn.close()
+			
+			
+def writeToLog(self):
+	conn = sqlite3.connect('dailyFileCopy.db')
+	with conn:
+		c = conn.cursor()
+		now = datetime.datetime.now()
+		c.execute('INSERT INTO fileCheckLog(fcTime) VALUES(?)', (now,))
+		conn.commit()
+	conn.close()
 	
 def getDailyPath(self):
 	dailyPath = filedialog.askdirectory(initialdir = "C:\\", title = "Select your Daily Folder")	
 	self.dail.set(dailyPath)
+				
 				
 def getDestPath(self):
 	destPath = filedialog.askdirectory(initialdir = "C:\\", title = "Select your Destination Folder") 
@@ -45,6 +81,12 @@ def checkIfMod(fname):
     
     return False
 	
+	
+def runAllTheThings(self):
+	copyFiles(self)
+	writeToLog(self)
+	displayLastCheck(self)
+
 
 def ask_quit(self):
     if messagebox.askokcancel("Exit program", "Okay to exit application?"):
